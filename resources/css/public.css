@@ -1,0 +1,9 @@
+/*
+ * Eigenes, schlankes Stylesheet für die öffentliche Statusseite (R39) und das
+ * Druck-Etikett: Die Statusseite wird fast nur per Handy-Scan aufgerufen und soll
+ * ohne Flux, Webfonts und JavaScript auskommen.
+ */
+@import 'tailwindcss' source(none);
+
+@source '../views/public';
+@source '../views/print';
