@@ -37,7 +37,9 @@ class User extends Authenticatable
      * @var array<string, mixed>
      */
     protected $attributes = [
-        'role' => 'borrower',
+        'role' => 'pending',
+        'notify_found_reports' => false,
+        'notify_registrations' => false,
     ];
 
     /**
@@ -63,6 +65,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => Role::class,
+            'notify_found_reports' => 'boolean',
+            'notify_registrations' => 'boolean',
         ];
     }
 
@@ -82,6 +86,11 @@ class User extends Authenticatable
     public function canManageInventory(): bool
     {
         return $this->role->canManageInventory();
+    }
+
+    public function isPending(): bool
+    {
+        return $this->role === Role::Pending;
     }
 
     /**

@@ -40,7 +40,8 @@
 
                 @if (auth()->user()->isAdmin())
                     <flux:sidebar.group heading="Administration" class="grid">
-                        <flux:sidebar.item icon="users" :href="route('users.index')" :current="request()->routeIs('users.*')" wire:navigate>
+                        @php($pendingUsers = \App\Models\User::query()->where('role', 'pending')->count())
+                        <flux:sidebar.item icon="users" :href="route('users.index', $pendingUsers ? ['status' => 'pending'] : [])" :current="request()->routeIs('users.*')" :badge="$pendingUsers ?: null" wire:navigate>
                             Benutzer
                         </flux:sidebar.item>
                         <flux:sidebar.item icon="document-magnifying-glass" :href="route('audit.index')" :current="request()->routeIs('audit.*')" wire:navigate>

@@ -2,11 +2,10 @@
 
 namespace App\Actions\FoundReports;
 
-use App\Enums\Role;
 use App\Models\FoundReport;
 use App\Models\Item;
-use App\Models\User;
 use App\Notifications\FoundReportSubmitted;
+use App\Support\NotificationRecipients;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
@@ -17,6 +16,11 @@ use Illuminate\Support\Facades\Validator;
  */
 class SubmitFoundReport
 {
+    public function __construct(private NotificationRecipients $recipients)
+    {
+        //
+    }
+
     /**
      * @param  array<string, mixed>  $input
      */
@@ -34,10 +38,7 @@ class SubmitFoundReport
             'contact' => filled($validated['contact'] ?? null) ? trim($validated['contact']) : null,
         ]));
 
-        Notification::send(
-            User::query()->whereIn('role', [Role::Manager, Role::Admin])->get(),
-            new FoundReportSubmitted($report),
-        );
+        Notification::send($this->recipients->foundReports(), new FoundReportSubmitted($report));
 
         return $report;
     }

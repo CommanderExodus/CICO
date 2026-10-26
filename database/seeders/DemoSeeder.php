@@ -45,18 +45,28 @@ class DemoSeeder extends Seeder
     }
 
     /**
-     * @return list<int>
+     * @return list<int> IDs der freigeschalteten Konten (nur diese leihen aus)
      */
     private function seedUsers(): array
     {
-        User::factory()->admin()->create(['name' => 'Alex Admin', 'email' => 'admin@cico.test']);
-        User::factory()->manager()->create(['name' => 'Vera Verwalter', 'email' => 'verwalter@cico.test']);
+        // Die Demo-Konten sind in ihre Benachrichtigungsgruppen eingetragen, damit die Funktion sichtbar ist.
+        User::factory()->admin()->create([
+            'name' => 'Alex Admin', 'email' => 'admin@cico.test', 'notify_found_reports' => true, 'notify_registrations' => true,
+        ]);
+        User::factory()->manager()->create([
+            'name' => 'Vera Verwalter', 'email' => 'verwalter@cico.test', 'notify_found_reports' => true,
+        ]);
         User::factory()->borrower()->create(['name' => 'Anna Ausleiher', 'email' => 'ausleiher@cico.test']);
 
         User::factory()->manager()->count(2)->create();
         User::factory()->borrower()->count(60)->create();
 
-        return User::query()->pluck('id')->all();
+        $active = User::query()->pluck('id')->all();
+
+        // Ein paar frische Registrierungen, die noch auf Freischaltung warten.
+        User::factory()->pending()->count(3)->create();
+
+        return $active;
     }
 
     /**

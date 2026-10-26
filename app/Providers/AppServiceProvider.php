@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Enums\AuditChannel;
+use App\Models\User;
 use App\Support\AuditContext;
 use App\Support\LocationTree;
 use Carbon\CarbonImmutable;
@@ -12,6 +13,7 @@ use Illuminate\Database\Events\TransactionRolledBack;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -33,6 +35,9 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         $this->configureAuditContext();
+
+        // Konten, die auf Freischaltung warten, haben keinerlei Rechte – in Web und MCP gleichermaßen.
+        Gate::before(fn (User $user) => $user->isPending() ? false : null);
     }
 
     /**

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureUserIsApproved;
 use App\Http\Middleware\SetAuditContext;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -15,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
             SetAuditContext::class,
+        ]);
+
+        $middleware->alias([
+            'approved' => EnsureUserIsApproved::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

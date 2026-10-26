@@ -48,6 +48,8 @@ Demo-Zugänge (Passwort jeweils `password`):
 | `verwalter@cico.test` | Verwalter |
 | `ausleiher@cico.test` | Ausleiher |
 
+Neue Registrierungen warten auf Freischaltung: Bis ein Admin ihnen unter **Benutzer** eine Rolle gibt, sehen sie keine Inhalte und haben keinen MCP-Zugang. Admins können wartende Konten auch ablehnen. Der Demo-Seeder legt drei solcher Konten an.
+
 Die Löschfrist für Finder-Kontaktdaten läuft über den Scheduler (`php artisan schedule:work` lokal, in `composer dev:win` enthalten; im Betrieb per Cron bzw. Windows-Aufgabenplanung `schedule:run`).
 
 ## MCP-Zugang
@@ -97,7 +99,11 @@ Bewusste Entscheidungen und Abweichungen:
 - **Stichtag-Tool (R28):** Fehlt bewusst, laut Dokument erst mit R19.
 - **R26:** Persönliche Tokens per Sanctum. OAuth 2.1 über Passport ist als Ausbau möglich.
 - **R16 teilweise vorgezogen:** Das Fundformular ist bereits auf 5 Meldungen pro Minute begrenzt.
-- **Benachrichtigungs-Mail (R14):** Sie enthält keine Finder-Kontaktdaten, damit diese nach Ablauf der Frist nicht in Postfächern weiterleben.
+- **Benachrichtigungen (R14):**
+  - Verwalter und Admins tragen sich unter *Einstellungen › Benachrichtigungen* für Fundmeldungen ein. Ist niemand eingetragen, geht die Mail an alle Verwalter und Admins, damit R14 erfüllt bleibt.
+  - Die Mail enthält keine Finder-Kontaktdaten, damit diese nach Ablauf der Frist nicht in Postfächern weiterleben.
+  - Für neue Registrierungen können sich nur Admins eintragen, hier gibt es keine Rückfallebene.
+- **Freischaltung:** Neue Konten bekommen die Rolle „wartet auf Freischaltung“. Das Dokument regelt die Registrierung nicht. Ohne Freischaltung sähe jeder Fremde den Katalog samt Lagerorten.
 - **R33:** Protokolliert jeden MCP-Aufruf außer `ping`.
 - **Kontolöschung:** Konten mit Ausleihhistorie bleiben erhalten (Revisionssicherheit), der letzte Admin kann sich nicht löschen oder herabstufen.
 

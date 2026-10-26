@@ -12,7 +12,12 @@ Route::post('i/{publicId}/found', [PublicItemController::class, 'report'])
     ->middleware('throttle:5,1')
     ->name('public.items.found');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+// Hinweisseite für Konten, die noch auf Freischaltung durch einen Admin warten.
+Route::middleware('auth')->get('pending', function () {
+    return auth()->user()->isPending() ? view('pending') : redirect()->route('dashboard');
+})->name('pending');
+
+Route::middleware(['auth', 'verified', 'approved'])->group(function () {
     Route::livewire('dashboard', 'pages::dashboard')->name('dashboard');
 
     Route::livewire('items', 'pages::items.index')->name('items.index');

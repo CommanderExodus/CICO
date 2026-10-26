@@ -34,7 +34,14 @@ class UserFactory extends Factory
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,
+            // Freigeschaltet als Ausleiher; neue Registrierungen über die App warten dagegen (pending).
+            'role' => Role::Borrower,
         ];
+    }
+
+    public function pending(): static
+    {
+        return $this->state(fn (array $attributes) => ['role' => Role::Pending]);
     }
 
     public function admin(): static

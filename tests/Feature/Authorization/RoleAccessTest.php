@@ -104,19 +104,10 @@ class RoleAccessTest extends TestCase
         $this->assertSame(Role::Admin, $admin->refresh()->role);
     }
 
-    public function test_new_registrations_become_borrowers(): void
-    {
-        $this->post(route('register.store'), [
-            'name' => 'Neu', 'email' => 'neu@example.com', 'password' => 'password', 'password_confirmation' => 'password',
-        ]);
-
-        $this->assertSame(Role::Borrower, User::query()->where('email', 'neu@example.com')->sole()->role);
-    }
-
     public function test_the_role_cannot_be_mass_assigned(): void
     {
         $user = new User(['name' => 'X', 'email' => 'x@example.com', 'password' => 'x', 'role' => 'admin']);
 
-        $this->assertSame(Role::Borrower, $user->role);
+        $this->assertSame(Role::Pending, $user->role);
     }
 }

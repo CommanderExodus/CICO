@@ -5,12 +5,20 @@ namespace App\Actions\Fortify;
 use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
 use App\Models\User;
+use App\Notifications\UserRegistered;
+use App\Support\NotificationRecipients;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 
 class CreateNewUser implements CreatesNewUsers
 {
     use PasswordValidationRules, ProfileValidationRules;
+
+    public function __construct(private NotificationRecipients $recipients)
+    {
+        //
+    }
 
     /**
      * Validate and create a newly registered user.
@@ -24,10 +32,16 @@ class CreateNewUser implements CreatesNewUsers
             'password' => $this->passwordRules(),
         ])->validate();
 
-        return User::create([
+        // Neue Konten starten als „wartet auf Freischaltung“ (Default der Rolle) und sehen nichts,
+        // bis ein Admin sie freischaltet. Eingetragene Admins werden benachrichtigt.
+        $user = User::create([
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => $input['password'],
         ]);
+
+        Notification::send($this->recipients->registrations(), new UserRegistered($user));
+
+        return $user;
     }
 }

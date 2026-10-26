@@ -7,6 +7,9 @@
                 <flux:navlist.item :href="route('two-factor.show')" wire:navigate>{{ __('Two-factor auth') }}</flux:navlist.item>
             @endif
             <flux:navlist.item :href="route('appearance.edit')" wire:navigate>{{ __('Appearance') }}</flux:navlist.item>
+            @if (auth()->user()->canManageInventory())
+                <flux:navlist.item :href="route('notifications.edit')" wire:navigate>Benachrichtigungen</flux:navlist.item>
+            @endif
             <flux:navlist.item :href="route('api-tokens.index')" wire:navigate>MCP-Zugang</flux:navlist.item>
         </flux:navlist>
     </div>
