@@ -2,9 +2,11 @@
 
 namespace Tests\Feature\Authorization;
 
+use App\Actions\Loans\ReserveItem;
 use App\Actions\Users\ChangeUserRole;
 use App\Actions\Users\RejectRegistration;
 use App\Enums\Role;
+use App\Models\Item;
 use App\Models\Loan;
 use App\Models\User;
 use App\Notifications\UserRegistered;
@@ -62,6 +64,23 @@ class AccountApprovalTest extends TestCase
 
         $this->assertSame([], $this->mcp('tools/list', token: $token)->json('result.tools'));
         $this->mcp('tools/call', ['name' => 'search-items', 'arguments' => (object) []], $token)->assertJsonPath('error.code', -32602);
+    }
+
+    public function test_pending_accounts_cannot_reserve_through_the_service_layer(): void
+    {
+        // Web und MCP halten wartende Konten schon vorher ab; Gate::before sichert jeden weiteren Weg.
+        $item = Item::factory()->create();
+
+        try {
+            app(ReserveItem::class)->handle(User::factory()->pending()->create(), [
+                'item_id' => $item->id,
+                'starts_on' => today()->toDateString(),
+                'ends_on' => today()->addDay()->toDateString(),
+            ]);
+            $this->fail('Ein wartendes Konto hätte nicht reservieren dürfen.');
+        } catch (AuthorizationException) {
+            $this->assertSame(0, Loan::query()->count());
+        }
     }
 
     public function test_approved_users_no_longer_see_the_waiting_page(): void
