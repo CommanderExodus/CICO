@@ -207,9 +207,12 @@ new #[Title('Gegenstand')] class extends Component {
                 <flux:heading size="lg">Reservieren</flux:heading>
 
                 <form wire:submit="reserve" class="flex flex-col gap-4">
-                    <div class="grid gap-4 sm:grid-cols-2">
-                        <flux:input wire:model="starts_on" type="date" label="Abholung am" required />
-                        <flux:input wire:model="ends_on" type="date" label="Rückgabe am" description="Am Rückgabetag darf schon der Nächste abholen." required />
+                    <div class="flex flex-col gap-2">
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <flux:input wire:model="starts_on" type="date" label="Abholung am" required />
+                            <flux:input wire:model="ends_on" type="date" label="Rückgabe am" required />
+                        </div>
+                        <flux:text class="text-xs">Am Rückgabetag darf schon der Nächste abholen. Gleicher Tag für beides = Tagesleihe.</flux:text>
                     </div>
 
                     @if (auth()->user()->canManageInventory())
