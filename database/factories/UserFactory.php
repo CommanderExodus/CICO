@@ -2,12 +2,14 @@
 
 namespace Database\Factories;
 
+use App\Enums\Role;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ * @extends Factory<User>
  */
 class UserFactory extends Factory
 {
@@ -33,6 +35,21 @@ class UserFactory extends Factory
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,
         ];
+    }
+
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => ['role' => Role::Admin]);
+    }
+
+    public function manager(): static
+    {
+        return $this->state(fn (array $attributes) => ['role' => Role::Manager]);
+    }
+
+    public function borrower(): static
+    {
+        return $this->state(fn (array $attributes) => ['role' => Role::Borrower]);
     }
 
     /**

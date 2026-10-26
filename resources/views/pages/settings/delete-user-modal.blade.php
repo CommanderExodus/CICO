@@ -1,8 +1,9 @@
 <?php
 
+use App\Actions\Users\DeleteUserAccount;
 use App\Concerns\PasswordValidationRules;
-use App\Livewire\Actions\Logout;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 
 new class extends Component {
@@ -12,14 +13,23 @@ new class extends Component {
 
     /**
      * Delete the currently authenticated user.
+     *
+     * Erst löschen, dann abmelden: Das Löschen kann scheitern (Ausleihhistorie), und dann
+     * soll der Nutzer angemeldet bleiben. logoutCurrentDevice() speichert das bereits
+     * gelöschte Model nicht erneut (logout() würde den Remember-Token rotieren und es
+     * dadurch wieder anlegen).
      */
-    public function deleteUser(Logout $logout): void
+    public function deleteUser(DeleteUserAccount $delete): void
     {
         $this->validate([
             'password' => $this->currentPasswordRules(),
         ]);
 
-        tap(Auth::user(), $logout(...))->delete();
+        $delete->handle(Auth::user());
+
+        Auth::guard('web')->logoutCurrentDevice();
+        Session::invalidate();
+        Session::regenerateToken();
 
         $this->redirect('/', navigate: true);
     }

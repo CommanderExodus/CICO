@@ -5,22 +5,37 @@ on:
     branches:
       - develop
       - main
-      - master
-      - workos
   pull_request:
     branches:
       - develop
       - main
-      - master
-      - workos
 
 jobs:
   ci:
     runs-on: ubuntu-latest
-    environment: Testing
-    strategy:
-      matrix:
-        php-version: ['8.4', '8.5']
+
+    # Die Integritätsregeln leben in PostgreSQL (Exclusion Constraints, Trigger) –
+    # die Tests laufen deshalb gegen eine echte Datenbank, nicht gegen SQLite.
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: cico_test
+          POSTGRES_USER: cico
+          POSTGRES_PASSWORD: cico
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U cico -d cico_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_USERNAME: cico
+      DB_PASSWORD: cico
 
     steps:
       - name: Checkout code
@@ -29,9 +44,10 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }}
+          php-version: '8.4'
+          extensions: pdo_pgsql, pgsql, intl, mbstring, zip
           tools: composer:v2
-          coverage: xdebug
+          coverage: none
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -40,9 +56,6 @@ jobs:
 
       - name: Install Node Dependencies
         run: npm i
-
-      - name: Add Flux Credentials Loaded From ENV
-        run: composer config http-basic.composer.fluxui.dev "${{ secrets.FLUX_USERNAME }}" "${{ secrets.FLUX_LICENSE_KEY }}"
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader

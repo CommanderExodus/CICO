@@ -11,22 +11,50 @@
             </flux:sidebar.header>
 
             <flux:sidebar.nav>
-                <flux:sidebar.group :heading="__('Platform')" class="grid">
+                <flux:sidebar.group heading="Inventar" class="grid">
                     <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
-                        {{ __('Dashboard') }}
+                        Übersicht
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="cube" :href="route('items.index')" :current="request()->routeIs('items.*')" wire:navigate>
+                        Gegenstände
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="arrows-right-left" :href="route('loans.index')" :current="request()->routeIs('loans.*')" wire:navigate>
+                        {{ auth()->user()->canManageInventory() ? 'Ausleihen' : 'Meine Ausleihen' }}
                     </flux:sidebar.item>
                 </flux:sidebar.group>
+
+                @if (auth()->user()->canManageInventory())
+                    <flux:sidebar.group heading="Verwaltung" class="grid">
+                        <flux:sidebar.item icon="map-pin" :href="route('locations.index')" :current="request()->routeIs('locations.*')" wire:navigate>
+                            Standorte
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="tag" :href="route('categories.index')" :current="request()->routeIs('categories.*')" wire:navigate>
+                            Kategorien
+                        </flux:sidebar.item>
+                        @php($openFoundReports = \App\Models\FoundReport::query()->where('status', 'open')->count())
+                        <flux:sidebar.item icon="hand-raised" :href="route('found-reports.index')" :current="request()->routeIs('found-reports.*')" :badge="$openFoundReports ?: null" wire:navigate>
+                            Fundmeldungen
+                        </flux:sidebar.item>
+                    </flux:sidebar.group>
+                @endif
+
+                @if (auth()->user()->isAdmin())
+                    <flux:sidebar.group heading="Administration" class="grid">
+                        <flux:sidebar.item icon="users" :href="route('users.index')" :current="request()->routeIs('users.*')" wire:navigate>
+                            Benutzer
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="document-magnifying-glass" :href="route('audit.index')" :current="request()->routeIs('audit.*')" wire:navigate>
+                            Audit-Trail
+                        </flux:sidebar.item>
+                    </flux:sidebar.group>
+                @endif
             </flux:sidebar.nav>
 
             <flux:spacer />
 
             <flux:sidebar.nav>
-                <flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                    {{ __('Repository') }}
-                </flux:sidebar.item>
-
-                <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                    {{ __('Documentation') }}
+                <flux:sidebar.item icon="key" :href="route('api-tokens.index')" :current="request()->routeIs('api-tokens.*')" wire:navigate>
+                    MCP-Zugang
                 </flux:sidebar.item>
             </flux:sidebar.nav>
 
@@ -89,6 +117,8 @@
         </flux:header>
 
         {{ $slot }}
+
+        <flux:toast />
 
         @fluxScripts
     </body>
