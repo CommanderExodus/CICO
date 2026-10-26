@@ -6,6 +6,14 @@ Jeder Gegenstand trägt einen QR-Code, der ohne Login auf eine öffentliche Stat
 
 **Stack:** Laravel 12 · PHP 8.4 · PostgreSQL 18 · Livewire 4 + Flux · laravel/mcp · Sanctum
 
+| Übersicht für Verwalter | Gegenstand mit QR-Code, Reservierung und Verfügbarkeit |
+|---|---|
+| ![Übersicht](docs/screenshots/dashboard.png) | ![Gegenstand](docs/screenshots/gegenstand.png) |
+
+| Audit-Trail: alter und neuer Wert je Änderung | Öffentliche Statusseite (Handy) |
+|---|---|
+| ![Audit-Trail](docs/screenshots/audit-trail.png) | <img src="docs/screenshots/statusseite.png" alt="Statusseite" width="260"> |
+
 ## Schnellstart
 
 Voraussetzungen: PHP 8.4 (mit `pdo_pgsql`, `intl`, `mbstring`, `zip`), Composer, Node 22+, PostgreSQL 15+.
@@ -120,3 +128,7 @@ Die Tests laufen gegen die PostgreSQL-Datenbank `cico_test`, weil die Integritä
 - die öffentliche Seite (keine personenbezogenen Daten, Fundmeldung, Löschfrist, Rate-Limit),
 - jedes MCP-Tool über den echten HTTP-Endpunkt mit Token, inklusive Rechteverletzungen,
 - Audit-Trail und Seeder.
+
+---
+
+Entwickelt mit Unterstützung von [Claude Code](https://claude.com/claude-code).
