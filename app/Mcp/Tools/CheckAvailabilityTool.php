@@ -18,7 +18,7 @@ use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
 
 #[Name('check-availability')]
 #[Title('Verfügbarkeit prüfen')]
-#[Description('Prüft, ob ein Einzelgegenstand in einem Zeitraum (inklusive Start- und Endtag) frei ist, und nennt belegte Zeiträume. Namen anderer Ausleiher sind nur für Verwalter sichtbar.')]
+#[Description('Prüft, ob ein Einzelgegenstand für eine Abholung am Tag from und Rückgabe am Tag to frei ist, und nennt belegte Zeiträume. Am Rückgabetag darf bereits jemand anderes abholen; für eine Tagesleihe from = to setzen. Namen anderer Ausleiher sind nur für Verwalter sichtbar.')]
 #[IsReadOnly]
 #[IsIdempotent]
 class CheckAvailabilityTool extends InventoryTool
@@ -55,8 +55,8 @@ class CheckAvailabilityTool extends InventoryTool
     {
         return [
             'item_id' => $schema->integer()->description('ID des Gegenstands (aus search-items).')->required(),
-            'from' => $schema->string()->format('date')->description('Erster Tag, JJJJ-MM-TT.')->required(),
-            'to' => $schema->string()->format('date')->description('Letzter Tag, JJJJ-MM-TT.')->required(),
+            'from' => $schema->string()->format('date')->description('Abholtag, JJJJ-MM-TT.')->required(),
+            'to' => $schema->string()->format('date')->description('Rückgabetag, JJJJ-MM-TT; gleich from für eine Tagesleihe.')->required(),
         ];
     }
 }

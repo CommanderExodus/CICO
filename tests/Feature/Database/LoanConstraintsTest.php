@@ -42,9 +42,36 @@ class LoanConstraintsTest extends TestCase
     {
         $this->loan('2026-11-01', '2026-11-05');
 
-        $this->assertConstraintViolation('loans_no_overlap', fn () => $this->loan('2026-11-05', '2026-11-08'));
-        $this->assertConstraintViolation('loans_no_overlap', fn () => $this->loan('2026-10-30', '2026-11-01'));
+        $this->assertConstraintViolation('loans_no_overlap', fn () => $this->loan('2026-11-04', '2026-11-08'));
+        $this->assertConstraintViolation('loans_no_overlap', fn () => $this->loan('2026-10-30', '2026-11-02'));
         $this->assertConstraintViolation('loans_no_overlap', fn () => $this->loan('2026-11-02', '2026-11-03'));
+    }
+
+    public function test_the_next_borrower_may_pick_up_on_the_return_day(): void
+    {
+        $this->loan('2026-11-01', '2026-11-05');
+        $this->loan('2026-11-05', '2026-11-08');
+        $this->loan('2026-10-28', '2026-11-01');
+
+        $this->assertSame(3, Loan::query()->count());
+    }
+
+    public function test_a_single_day_loan_blocks_exactly_that_day(): void
+    {
+        $this->loan('2026-11-01', '2026-11-05');
+
+        // Rückgabe am 5. morgens, Tagesleihe am 5. danach: erlaubt.
+        $this->loan('2026-11-05', '2026-11-05');
+
+        // Am 5. ist nun belegt – weder eine zweite Tagesleihe noch eine Leihe ab dem 5. passt.
+        $this->assertConstraintViolation('loans_no_overlap', fn () => $this->loan('2026-11-05', '2026-11-05'));
+        $this->assertConstraintViolation('loans_no_overlap', fn () => $this->loan('2026-11-05', '2026-11-07'));
+
+        // Eine Tagesleihe mitten in einer laufenden Leihe kollidiert ebenfalls.
+        $this->assertConstraintViolation('loans_no_overlap', fn () => $this->loan('2026-11-03', '2026-11-03'));
+
+        // Ab dem Folgetag ist der Gegenstand wieder frei.
+        $this->loan('2026-11-06', '2026-11-07');
     }
 
     public function test_adjacent_periods_and_other_items_do_not_conflict(): void

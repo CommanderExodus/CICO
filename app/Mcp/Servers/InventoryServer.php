@@ -34,7 +34,8 @@ use Throwable;
     unter dem Konto des angemeldeten Nutzers und haben genau dessen Rechte.
     Mit search-items Gegenstände finden (liefert die IDs), mit check-availability
     prüfen, ob ein Einzelgegenstand in einem Zeitraum frei ist, und mit
-    list-my-loans die eigenen Ausleihen abrufen. Datumsangaben im Format JJJJ-MM-TT.
+    list-my-loans die eigenen Ausleihen abrufen. Datumsangaben im Format JJJJ-MM-TT;
+    ein Zeitraum reicht vom Abholtag bis zum Rückgabetag, an dem schon der Nächste abholen darf.
     MARKDOWN)]
 class InventoryServer extends Server
 {

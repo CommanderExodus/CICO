@@ -112,11 +112,17 @@ class Loan extends Model
     }
 
     /**
+     * Ausleihen, die eine Abholung am $from und Rückgabe am $to blockieren würden. Gleiche Regel wie
+     * die Spalte period: Der Rückgabetag ist frei für den Nächsten, eine Tagesleihe belegt ihren Tag.
+     *
      * @param  Builder<Loan>  $query
      */
     public function scopeOverlapping(Builder $query, CarbonInterface $from, CarbonInterface $to): void
     {
-        $query->whereRaw("period && daterange(?::date, ?::date, '[]')", [$from->toDateString(), $to->toDateString()]);
+        $query->whereRaw(
+            "period && daterange(?::date, greatest(?::date, ?::date + 1), '[)')",
+            [$from->toDateString(), $to->toDateString(), $from->toDateString()],
+        );
     }
 
     public function isOverdue(?CarbonInterface $today = null): bool

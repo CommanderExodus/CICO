@@ -38,9 +38,15 @@ class CheckAvailabilityToolTest extends TestCase
             ->assertJsonPath('result.structuredContent.conflicts', []);
     }
 
+    public function test_picking_up_on_the_return_day_of_another_loan_is_possible(): void
+    {
+        $this->callTool(User::factory()->create(), 'check-availability', ['item_id' => $this->item->id, 'from' => '2026-12-12', 'to' => '2026-12-14'])
+            ->assertJsonPath('result.structuredContent.available', true);
+    }
+
     public function test_a_conflict_is_reported_without_the_borrower_for_borrowers(): void
     {
-        $this->callTool(User::factory()->borrower()->create(), 'check-availability', ['item_id' => $this->item->id, 'from' => '2026-12-12', 'to' => '2026-12-14'])
+        $this->callTool(User::factory()->borrower()->create(), 'check-availability', ['item_id' => $this->item->id, 'from' => '2026-12-11', 'to' => '2026-12-14'])
             ->assertJsonPath('result.structuredContent.available', false)
             ->assertJsonPath('result.structuredContent.conflicts.0.starts_on', '2026-12-10')
             ->assertJsonPath('result.structuredContent.conflicts.0.borrower', null)
@@ -49,7 +55,7 @@ class CheckAvailabilityToolTest extends TestCase
 
     public function test_managers_see_who_booked_the_item(): void
     {
-        $this->callTool(User::factory()->manager()->create(), 'check-availability', ['item_id' => $this->item->id, 'from' => '2026-12-12', 'to' => '2026-12-14'])
+        $this->callTool(User::factory()->manager()->create(), 'check-availability', ['item_id' => $this->item->id, 'from' => '2026-12-11', 'to' => '2026-12-14'])
             ->assertJsonPath('result.structuredContent.conflicts.0.borrower', 'Bernd Borger');
     }
 

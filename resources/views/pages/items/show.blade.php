@@ -208,8 +208,8 @@ new #[Title('Gegenstand')] class extends Component {
 
                 <form wire:submit="reserve" class="flex flex-col gap-4">
                     <div class="grid gap-4 sm:grid-cols-2">
-                        <flux:input wire:model="starts_on" type="date" label="Von" required />
-                        <flux:input wire:model="ends_on" type="date" label="Bis (einschließlich)" required />
+                        <flux:input wire:model="starts_on" type="date" label="Abholung am" required />
+                        <flux:input wire:model="ends_on" type="date" label="Rückgabe am" description="Am Rückgabetag darf schon der Nächste abholen." required />
                     </div>
 
                     @if (auth()->user()->canManageInventory())
@@ -239,8 +239,8 @@ new #[Title('Gegenstand')] class extends Component {
                 <flux:heading size="lg">Verfügbarkeit prüfen</flux:heading>
 
                 <form wire:submit="checkAvailability" class="grid gap-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
-                    <flux:input wire:model="check_from" type="date" label="Von" required />
-                    <flux:input wire:model="check_to" type="date" label="Bis" required />
+                    <flux:input wire:model="check_from" type="date" label="Abholung" required />
+                    <flux:input wire:model="check_to" type="date" label="Rückgabe" required />
                     <flux:button type="submit">Prüfen</flux:button>
                 </form>
 

@@ -77,7 +77,7 @@ Die Datenbank ist die letzte Instanz für Integrität (R36):
 |---|---|
 | Einzelgegenstand ↔ Seriennummer, Mengenware ↔ Menge (R1) | `CHECK items_kind_fields`, eindeutige Seriennummern per Partial Index |
 | Standortbaum ohne Zyklen (R2) | Trigger `locations_prevent_cycle` mit Advisory Lock gegen parallele Umhängungen |
-| Keine überlappenden Ausleihen (R6) | `EXCLUDE USING gist (item_id WITH =, period WITH &&) WHERE status IN ('reserved','issued')` |
+| Keine überlappenden Ausleihen (R6) | `EXCLUDE USING gist (item_id WITH =, period WITH &&) WHERE status IN ('reserved','issued')` auf `period = [Abholtag, max(Rückgabetag, Abholtag + 1))` – am Rückgabetag darf der Nächste abholen, eine Tagesleihe belegt genau ihren Tag |
 | Nur einmal gleichzeitig ausgegeben | Partial Unique Index `loans_one_issued_per_item` (greift auch bei überfälligen Rückgaben) |
 | Gültige Statuswechsel, abgeschlossene Ausleihen unveränderlich, kein Löschen | Trigger `loans_guard` |
 | Mengenware im MVP nicht ausleihbar | Fremdschlüssel auf `items(id, kind)` + `CHECK loans_unit_items_only` |
